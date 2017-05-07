@@ -2,16 +2,20 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"image"
 	"image/color"
 	"image/png"
 	"log"
 	"math/rand"
 	"os"
+	"strconv"
+	"time"
 )
 
 var (
 	fname string
+	seed  Seed
 
 	width, height int
 
@@ -21,6 +25,7 @@ var (
 
 func main() {
 	flag.StringVar(&fname, "fname", "caves.png", "name of the output file")
+	flag.Var(&seed, "seed", "a 64-bit signed integer to use as the seed, or \"time\"")
 
 	flag.IntVar(&width, "width", 500, "width of the map")
 	flag.IntVar(&height, "height", 500, "height of the map")
@@ -29,6 +34,7 @@ func main() {
 	flag.IntVar(&N, "N", 1, "number of smoothing iterations")
 
 	flag.Parse()
+	rand.Seed(int64(seed))
 
 	g := newGrid(width, height)
 	g.step(func(x, y int) int {
@@ -51,6 +57,23 @@ func main() {
 
 	png.Encode(f, draw(g, colorFor))
 }
+
+type Seed int64
+
+func (s *Seed) Set(t string) error {
+	if t == "time" {
+		*s = Seed(time.Now().Unix())
+		return nil
+	}
+
+	n, err := strconv.ParseInt(t, 10, 64)
+	if err == nil {
+		*s = Seed(n)
+	}
+	return err
+}
+
+func (s *Seed) String() string { return fmt.Sprint(*s) }
 
 func boxSmooth(g *grid, Δx, Δy int) rule {
 	area := float64((1 + 2*Δx) * (1 + 2*Δy))
