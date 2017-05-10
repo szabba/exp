@@ -1,7 +1,7 @@
 Generating text with context free grammars.
 
-* [ ] Code to load a grammar from JSON
-* [ ] JSON repr of the default grammar
+* [x] Code to load a grammar from JSON
+* [x] JSON repr of the default grammar
 * [ ] file to load JSON from as an option
     * default = `""` -- memory
     * `"-"` -- from stdin

@@ -4,30 +4,19 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"os"
 	"time"
 )
 
 func main() {
-	sp := Literal(" ")
-	the := Literal("the")
-	var bd Builder
-	bd.Add("deed", Alternative{Literal("ate"), Literal("beat"), Literal("bested"), Literal("outsmarted")})
-	bd.Add("hero", Alternative{Literal("jello"), Literal("mayo"), Literal("broccoli")})
-	bd.Add("villain", Alternative{Literal("carrot"), Literal("soup"), Literal("bean")})
-	bd.Add("postrait", Alternative{Literal("cunning"), Literal("brave"), Literal("genuine"), Literal("resourceful")})
-	bd.Add("negtrait", Alternative{Literal("treacherous"), Literal("reckless"), Literal("dumb"), Literal("means-justifying")})
-	bd.Add("sentence", Sequence{
-		the, sp,
-		Reference("postrait"), sp,
-		Reference("hero"), sp,
-		Reference("deed"), sp,
-		the, sp,
-		Reference("negtrait"), sp,
-		Reference("villain"),
-	})
-	g, _ := bd.Build("sentence")
+	def, err := parseDefinition([]byte(defaultGrammar))
+	if err != nil {
+		log.Fatalf("error parsing default grammar: %s", err)
+	}
+
+	g, _ := def.Build()
 	rng := rand.New(rand.NewSource(time.Now().Unix()))
 	g.Generate(os.Stdout, rng)
 }
