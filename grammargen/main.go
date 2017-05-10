@@ -17,7 +17,7 @@ func main() {
 	}
 
 	g, _ := def.Build()
-	rng := rand.New(rand.NewSource(time.Now().Unix()))
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	g.Generate(os.Stdout, rng)
 }
 
