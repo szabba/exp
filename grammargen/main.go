@@ -2,23 +2,85 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 )
 
+var (
+	srcFlag InputSourceFlag
+)
+
 func main() {
-	def, err := parseDefinition([]byte(defaultGrammar))
-	if err != nil {
-		log.Fatalf("error parsing default grammar: %s", err)
+	flag.Var(&srcFlag, "src",
+		"source for the grammar definition; "+
+			"empty means use default value; "+
+			"\"-\" means use standard input; "+
+			"interpreted as filename otherwise",
+	)
+	flag.Parse()
+
+	r := srcFlag.Get()
+
+	switch rc := r.(type) {
+	case io.ReadCloser:
+		defer rc.Close()
 	}
 
-	g, _ := def.Build()
+	defText, err := ioutil.ReadAll(r)
+	if err != nil {
+		log.Fatalf("error reading grammar def: %s", err)
+	}
+
+	def, err := parseDefinition(defText)
+	if err != nil {
+		log.Fatalf("error parsing grammar def: %s", err)
+	}
+
+	g, err := def.Build()
+	if err != nil {
+		log.Fatalf("error building grammar: %s", err)
+	}
+
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	g.Generate(os.Stdout, rng)
+}
+
+type InputSourceFlag struct {
+	val string
+	r   io.Reader
+}
+
+func (src *InputSourceFlag) Set(val string) error {
+	src.val = val
+	if val == "" {
+		src.r = strings.NewReader(defaultGrammar)
+		return nil
+	} else if val == "-" {
+		src.r = os.Stdin
+		return nil
+	} else {
+		var err error
+		src.r, err = os.Open(val)
+		return err
+	}
+}
+
+func (src *InputSourceFlag) String() string {
+	return src.val
+}
+
+func (src *InputSourceFlag) Get() io.Reader {
+	if src.val == "" && src.r == nil {
+		src.r = strings.NewReader(defaultGrammar)
+	}
+	return src.r
 }
 
 type Builder struct {
