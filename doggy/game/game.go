@@ -4,6 +4,10 @@ import "time"
 
 type Game struct{}
 
+func New() *Game {
+	return &Game{}
+}
+
 // Current position of the dog.
 func (g *Game) DogAt() [3]float64 {
 	var zero [3]float64

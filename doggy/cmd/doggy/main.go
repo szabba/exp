@@ -1,7 +1,6 @@
 package main
 
 import (
-	"image/color"
 	"log"
 	"time"
 
@@ -9,9 +8,8 @@ import (
 
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
-	"github.com/llgcode/draw2d"
 	"github.com/llgcode/draw2d/draw2dgl"
-	"github.com/llgcode/draw2d/draw2dkit"
+	"github.com/szabba/exp/doggy/game"
 )
 
 func main() {
@@ -32,6 +30,7 @@ func main() {
 
 type GameWindow struct {
 	*glfw.Window
+	game *game.Game
 }
 
 func New() (*GameWindow, error) {
@@ -64,6 +63,8 @@ func New() (*GameWindow, error) {
 	gw.SetSizeCallback(gw.OnResize)
 	gw.OnResize(gw.Window, 800, 600)
 
+	gw.game = game.New()
+
 	return &gw, nil
 }
 
@@ -95,14 +96,5 @@ func (gw *GameWindow) Render() {
 	gl.LineWidth(1)
 
 	ctx := draw2dgl.NewGraphicContext(gw.GetSize())
-	ctx.SetFontData(draw2d.FontData{
-		Name:   "luxi",
-		Family: draw2d.FontFamilyMono,
-		Style:  draw2d.FontStyleBold | draw2d.FontStyleItalic})
-
-	ctx.BeginPath()
-	draw2dkit.RoundedRectangle(ctx, 200, 200, 600, 600, 100, 100)
-
-	ctx.SetFillColor(color.RGBA{0, 0, 0, 0xff})
-	ctx.Fill()
+	game.Draw(ctx, gw.game)
 }
