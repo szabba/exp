@@ -2,11 +2,17 @@ package main
 
 import (
 	"log"
+	"time"
 
+	"runtime"
+
+	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 )
 
 func main() {
+	runtime.LockOSThread()
+
 	window, err := New()
 	if err != nil {
 		log.Fatal(err)
@@ -15,6 +21,7 @@ func main() {
 	for !window.ShouldClose() {
 		window.Render()
 		glfw.PollEvents()
+		time.Sleep(time.Second / 60)
 	}
 }
 
@@ -41,6 +48,13 @@ func New() (*GameWindow, error) {
 		return nil, err
 	}
 
+	err = gl.Init()
+	if err != nil {
+		return nil, err
+	}
+
+	gl.ClearColor(1, 1, 1, 1)
+
 	gw.MakeContextCurrent()
 	gw.SetSizeCallback(gw.OnResize)
 	gw.OnResize(gw.Window, 800, 600)
@@ -55,8 +69,22 @@ func (gw *GameWindow) CleanUp() {
 	glfw.Terminate()
 }
 
-func (gw *GameWindow) OnResize(_ *glfw.Window, newW, newH int) {
-	log.Printf("new size is %dx%d", newW, newH)
+func (gw *GameWindow) OnResize(_ *glfw.Window, w, h int) {
+	gl.Viewport(0, 0, int32(w), int32(h))
+	gl.MatrixMode(gl.PROJECTION)
+	gl.LoadIdentity()
+	gl.Ortho(0, float64(w), 0, float64(h), -1, 1)
+	gl.Scalef(1, -1, 1)
+	gl.Translatef(0, float32(-h), 0)
+
+	gl.Enable(gl.BLEND)
+	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+	gl.Disable(gl.DEPTH_TEST)
 }
 
-func (gw *GameWindow) Render() {}
+func (gw *GameWindow) Render() {
+	defer gw.SwapBuffers()
+	defer gl.Flush()
+
+	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+}
