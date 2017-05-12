@@ -54,9 +54,9 @@ func New() (*GameWindow, error) {
 		return nil, err
 	}
 
+	gw.MakeContextCurrent()
 	gl.ClearColor(1, 1, 1, 1)
 
-	gw.MakeContextCurrent()
 	gw.SetSizeCallback(gw.OnResize)
 	gw.OnResize(gw.Window, 800, 600)
 
