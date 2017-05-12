@@ -14,6 +14,7 @@ func main() {
 	runtime.LockOSThread()
 
 	window, err := New()
+	defer window.CleanUp()
 	if err != nil {
 		log.Fatal(err)
 	}
