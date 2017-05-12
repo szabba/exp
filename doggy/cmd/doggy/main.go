@@ -24,6 +24,11 @@ type GameWindow struct {
 
 func New() (*GameWindow, error) {
 
+	const (
+		width, height = 800, 600
+		title         = "doggy"
+	)
+
 	err := glfw.Init()
 	if err != nil {
 		return nil, err
@@ -31,10 +36,14 @@ func New() (*GameWindow, error) {
 
 	var gw GameWindow
 
-	gw.Window, err = glfw.CreateWindow(800, 600, "doggy", nil, nil)
+	gw.Window, err = glfw.CreateWindow(width, height, title, nil, nil)
 	if err != nil {
 		return nil, err
 	}
+
+	gw.MakeContextCurrent()
+	gw.SetSizeCallback(gw.OnResize)
+	gw.OnResize(gw.Window, 800, 600)
 
 	return &gw, nil
 }
@@ -44,6 +53,10 @@ func (gw *GameWindow) CleanUp() {
 		// other cleanup
 	}
 	glfw.Terminate()
+}
+
+func (gw *GameWindow) OnResize(_ *glfw.Window, newW, newH int) {
+	log.Printf("new size is %dx%d", newW, newH)
 }
 
 func (gw *GameWindow) Render() {}
