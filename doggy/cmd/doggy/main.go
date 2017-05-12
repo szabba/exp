@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image/color"
 	"log"
 	"time"
 
@@ -8,6 +9,9 @@ import (
 
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
+	"github.com/llgcode/draw2d"
+	"github.com/llgcode/draw2d/draw2dgl"
+	"github.com/llgcode/draw2d/draw2dkit"
 )
 
 func main() {
@@ -88,4 +92,17 @@ func (gw *GameWindow) Render() {
 	defer gl.Flush()
 
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+	gl.LineWidth(1)
+
+	ctx := draw2dgl.NewGraphicContext(gw.GetSize())
+	ctx.SetFontData(draw2d.FontData{
+		Name:   "luxi",
+		Family: draw2d.FontFamilyMono,
+		Style:  draw2d.FontStyleBold | draw2d.FontStyleItalic})
+
+	ctx.BeginPath()
+	draw2dkit.RoundedRectangle(ctx, 200, 200, 600, 600, 100, 100)
+
+	ctx.SetFillColor(color.RGBA{0, 0, 0, 0xff})
+	ctx.Fill()
 }
