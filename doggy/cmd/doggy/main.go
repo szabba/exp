@@ -47,6 +47,7 @@ func New() (*GameWindow, error) {
 
 	var gw GameWindow
 
+	glfw.WindowHint(glfw.Resizable, glfw.False)
 	gw.Window, err = glfw.CreateWindow(width, height, title, nil, nil)
 	if err != nil {
 		return nil, err
