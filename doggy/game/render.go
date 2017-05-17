@@ -11,15 +11,19 @@ type State interface {
 	BallAt() [3]float64
 }
 
-func Draw(ctx draw2d.GraphicContext, state State) {
-	ctx.SetFontData(draw2d.FontData{
-		Name:   "luxi",
-		Family: draw2d.FontFamilyMono,
-		Style:  draw2d.FontStyleBold | draw2d.FontStyleItalic})
+func Draw(ctx draw2d.GraphicContext, state State, width, height float64) {
+	ctx.Save()
+	defer ctx.Restore()
+
+	r := 100.0
+	cx, cy := width/2, height/2
 
 	ctx.BeginPath()
-	draw2dkit.RoundedRectangle(ctx, 200, 200, 600, 600, 100, 100)
+	ctx.SetStrokeColor(color.Black)
+	ctx.SetFillColor(color.White)
+	ctx.SetLineWidth(1)
 
-	ctx.SetFillColor(color.Black)
-	ctx.Fill()
+	draw2dkit.Circle(ctx, cx, cy, r)
+
+	ctx.FillStroke()
 }

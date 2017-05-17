@@ -97,5 +97,6 @@ func (gw *GameWindow) Render() {
 	gl.LineWidth(1)
 
 	ctx := draw2dgl.NewGraphicContext(gw.GetSize())
-	game.Draw(ctx, gw.game)
+	w, h := gw.GetSize()
+	game.Draw(ctx, gw.game, float64(w), float64(h))
 }
