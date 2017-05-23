@@ -39,11 +39,12 @@
 (define (draw-program! prog)
   (charterm-clear-screen)
   (let-values [((w h) (charterm-screen-size))]
-    (~>> (program-model prog)
-         ((program-view prog) w h)
+    (~>> (~> prog program-model)
+         ((~> prog program-view) w h)
          (draw-lines! w h))))
 
 (define (draw-lines! w h lines)
+  ;; FIXME: build-list ?
   (~>> (iota h)
        (map (λ (i)
               (if (< i (length lines))

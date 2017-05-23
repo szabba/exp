@@ -10,16 +10,23 @@
    {'jokes 3 'adventures 7}
    (set
     (option "Boast of your deeds in the wild suburbia"
-            {'adventures '((>= 3))}
+            (λ (qs) (~> (qs 'adventures #:else 0) (>= 3)))
+
             '("Everyone's impressed you managed to survive amongst the middle class")
-            '((cool-factor + 3)))
+            (list (λ (qs) (dict-update qs 'cool-factor #λ(+ % 3) 0))))
+    
     (option "Charm them with your sense of humour"
-            {'jokes '((>= 2))}
+            (λ (qs) (~> (qs 'jokes #:else 0) (>= 2)))
+
             '("They laugh so hard their stomaches hurt")
-            '((cool-factor + 1)))
+            (list (λ (qs) (dict-update qs 'cool-factor #λ(+ % 1) 0))))
+    
     (option "Educate the philsitne rabble"
-            {'schoolwork '((>= 4)) 'snobbery '((>= 6))}
+            (λ (qs) (and (~> (qs 'schoolwork #:else 0) (>= 3))
+                         (~> (qs 'snobbery #:else 0) (>= 3))))
+
             '("You'll make some enemies...")
-            '((snobbery + 10) (cool-factor - 3))))))
+            (list (λ (qs) (dict-update qs 'cool-factor #λ(- % 3) 0))
+                  (λ (qs) (dict-update qs 'snobbery #λ(+ % 10) 0)))))))
 
 (run-world! world)
