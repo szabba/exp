@@ -55,9 +55,9 @@
 ;;;; Helpers
 
 
-#;(-> WorldState (Focus Option))
+#;(-> WorldState (Focus choice))
 (define (world->prompt world)
-  (match (~>> world world-state-available-options)
+  (match (~>> world world-state-available-choices)
     [(list) (list)]
     [(list head rest ...)
      (focus (list) head rest)]))
@@ -106,19 +106,19 @@
      (struct-copy log-n-prompt model
                   (prompt
                    (~>> prompt
-                        (shift-options focus-shift-up))))]
+                        (shift-choices focus-shift-up))))]
 
     [(list (log-n-prompt _ _ prompt 'prompt) 'down)
      (struct-copy log-n-prompt model
                   (prompt
                    (~>> prompt
-                        (shift-options focus-shift-down))))]
+                        (shift-choices focus-shift-down))))]
 
     [(list (log-n-prompt _ _ _ 'prompt) 'return)
      (~>> model
-         log-focused-option
+         log-focused-choice
          (model-scroll-log focus-scroll-down)
-         apply-focused-option
+         apply-focused-choice
          fix-up-prompt)]
 
     [_ model]))
@@ -147,14 +147,14 @@
 
 
 #;(-> (-> (Focus x) (Focus x)) (U Null (Focus x)))
-(define (shift-options dir opts)
+(define (shift-choices dir opts)
   (match opts
     [(list) (list)]
     [(focus _ _ _) (dir opts)]))
 
 
 #;(-> Model Model)
-(define (log-focused-option model)
+(define (log-focused-choice model)
   (match model
     [(log-n-prompt _ _ (list) _) model]
 
@@ -162,7 +162,7 @@
 
      (struct-copy log-n-prompt model
                   (log (~>> opt
-                           (lines-for-option #:first-entry? (null? log))
+                           (lines-for-choice #:first-entry? (null? log))
                            (append-to-log log))))]))
 
 
@@ -179,14 +179,14 @@
      (focus-append-below log lines)]))
 
 
-#;(-> Option #:first-entry? Boolean (List String))
-(define (lines-for-option opt #:first-entry? [firts? #f])
+#;(-> choice #:first-entry? Boolean (List String))
+(define (lines-for-choice opt #:first-entry? [firts? #f])
 
   (define (indent line)
     (string-append "    " line))
 
   (match opt
-    [(option title _ body-text _)
+    [(choice title _ body-text _)
 
      (let [(lines (append (list title)
                           (list "")
@@ -202,7 +202,7 @@
 
 
 #;(-> LogNPrompt LogNPrompt)
-(define (apply-focused-option model)
+(define (apply-focused-choice model)
   (match model
     [(log-n-prompt _ _ (list) _) model]
     [(log-n-prompt world
@@ -210,7 +210,7 @@
       (struct-copy log-n-prompt model
                   (world
                     (~>> opt
-                        (world-state-apply-option world))))]))
+                        (world-state-apply-choice world))))]))
 
 
 #;(-> LogNPrompt LogNPrompt)
@@ -236,7 +236,7 @@
      (view/log-n-prompt w h log prompt)]))
 
 
-#;(-> Int Int (U Null (Focus String)) (U Null (Focus Option)))
+#;(-> Int Int (U Null (Focus String)) (U Null (Focus choice)))
 (define (view/log-n-prompt w h log prompt)
 
   (define bottom
@@ -285,13 +285,13 @@
        (take-right l)))
 
 
-#;(-> (U Null (Focus Option) String))
+#;(-> (U Null (Focus choice) String))
 (define (current-prompt-line prompt)
   (match prompt
 
     [(list) "! No actions available."]
 
-    [(focus _ (option title _ _ _) _)
+    [(focus _ (choice title _ _ _) _)
      (string-append "> " title)]))
 
 

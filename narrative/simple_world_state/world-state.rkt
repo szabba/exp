@@ -5,36 +5,36 @@
 (provide (contract-out
           [struct world-state ((qualities any/c)
                                ; TODO/FIXME: listof ?
-                               (options (set/c option?)))]
+                               (choices (set/c choice?)))]
 
-          [struct option ((title string?)
+          [struct choice ((title string?)
                           (preconds (-> any/c boolean?))
                           (text (listof string?))
                           (effects (listof (-> any/c any/c))))]
 
-          [world-state-available-options (-> world-state? list?)]
-          [world-state-apply-option (-> world-state? option? world-state?)]))
+          [world-state-available-choices (-> world-state? list?)]
+          [world-state-apply-choice (-> world-state? choice? world-state?)]))
 
-(struct world-state (qualities options) #:transparent)
-(struct option (title preconds text effects) #:transparent)
+(struct world-state (qualities choices) #:transparent)
+(struct choice (title preconds text effects) #:transparent)
 
 ;;; What can be done?
 
-(define (world-state-available-options world)
+(define (world-state-available-choices world)
   (let [(aq (~>> world world-state-qualities))]
     (~>> world
-         world-state-options
+         world-state-choices
          set->list
-         (filter (λ (opt) (option-available aq opt))))))
+         (filter (λ (opt) (choice-available aq opt))))))
 
-(define (option-available aq opt)
-  ((~> opt option-preconds) aq))
-       
+(define (choice-available aq opt)
+  ((~> opt choice-preconds) aq))
+
 ;;; How are things done?
 
-(define (world-state-apply-option world opt)
+(define (world-state-apply-choice world opt)
   (struct-copy world-state world
                (qualities
                 (fold (λ (f x) (f x))
                       (~> world world-state-qualities)
-                      (~> opt option-effects)))))
+                      (~> opt choice-effects)))))

@@ -9,19 +9,19 @@
   (world-state
    {'jokes 3 'adventures 7}
    (set
-    (option "Boast of your deeds in the wild suburbia"
+    (choice "Boast of your deeds in the wild suburbia"
             (λ (qs) (~> (qs 'adventures #:else 0) (>= 3)))
 
             '("Everyone's impressed you managed to survive amongst the middle class")
             (list (λ (qs) (dict-update qs 'cool-factor #λ(+ % 3) 0))))
-    
-    (option "Charm them with your sense of humour"
+
+    (choice "Charm them with your sense of humour"
             (λ (qs) (~> (qs 'jokes #:else 0) (>= 2)))
 
             '("They laugh so hard their stomaches hurt")
             (list (λ (qs) (dict-update qs 'cool-factor #λ(+ % 1) 0))))
-    
-    (option "Educate the philsitne rabble"
+
+    (choice "Educate the philsitne rabble"
             (λ (qs) (and (~> (qs 'schoolwork #:else 0) (>= 3))
                          (~> (qs 'snobbery #:else 0) (>= 3))))
 
