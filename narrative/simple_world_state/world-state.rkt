@@ -4,8 +4,7 @@
 
 (provide (contract-out
           [struct world-state ((qualities any/c)
-                               ; TODO/FIXME: listof ?
-                               (choices (set/c choice?)))]
+                               (choices (listof choice?)))]
 
           [struct choice ((title string?)
                           (preconds (-> any/c boolean?))
@@ -21,13 +20,13 @@
 ;;; What can be done?
 
 (define (world-state-available-choices world)
-  (let [(aq (~>> world world-state-qualities))]
-    (~>> world
-         world-state-choices
-         set->list
-         (filter (λ (opt) (choice-available aq opt))))))
+  (match world
+    [(world-state qualities choices)
+     (~>> choices
+          (filter (λ (ch)
+                    (choice-available? qualities ch))))]))
 
-(define (choice-available aq opt)
+(define (choice-available? aq opt)
   ((~> opt choice-preconds) aq))
 
 ;;; How are things done?

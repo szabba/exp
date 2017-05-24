@@ -8,7 +8,7 @@
 (define world
   (world-state
    {'jokes 3 'adventures 7}
-   (set
+   (list
     (choice "Boast of your deeds in the wild suburbia"
             (λ (qs) (~> (qs 'adventures #:else 0) (>= 3)))
 
