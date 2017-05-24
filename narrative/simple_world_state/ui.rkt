@@ -173,7 +173,9 @@
     [(list _ (list)) log]
 
     [(list (list) lines)
-     (focus (drop-right lines 1) (last lines) (list))]
+     (focus (reverse (drop-right lines 1))
+            (last lines)
+            (list))]
 
     [(list (focus _ _ _) lines)
      (focus-append-below log lines)]))
