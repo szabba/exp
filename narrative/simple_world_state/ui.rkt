@@ -179,7 +179,7 @@
      (focus-append-below log lines)]))
 
 
-#;(-> choice #:first-entry? Boolean (List String))
+#;(-> Choice #:first-entry? Boolean (List String))
 (define (lines-for-choice opt #:first-entry? [firts? #f])
 
   (define (indent line)
@@ -188,13 +188,10 @@
   (match opt
     [(choice title _ body-text _)
 
-     (let [(lines (append (list title)
-                          (list "")
-                          (~>> body-text (map indent))))]
-
-       (if first-entry?
-           lines
-           (append (list "") lines)))]))
+     (append (if first-entry?
+                 (list title "")
+                 (list "" title ""))
+             (~>> body-text (map indent)))]))
 
 
 #;(-> x Boolean)
