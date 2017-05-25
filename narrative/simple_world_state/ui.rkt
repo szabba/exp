@@ -117,18 +117,10 @@
     [(list (log-n-prompt _ _ _ 'prompt) 'return)
      (~>> model
          log-focused-choice
-         (model-scroll-log focus-scroll-down)
          apply-focused-choice
          fix-up-prompt)]
 
     [_ model]))
-
-
-#;(-> (-> (Focus x) (Focus x)) LogNPrompt LogNPrompt)
-(define (model-scroll-log f model)
-  (struct-copy log-n-prompt model
-               (log
-                (~> model log-n-prompt-log f))))
 
 
 #;(-> (-> (Focus x) (Focus x)) (U Null (Focus x)))
@@ -171,14 +163,18 @@
 
   (match (list log lines)
     [(list _ (list)) log]
+    [(list (focus _ _ _) (list)) log]
 
     [(list (list) lines)
      (focus (reverse (drop-right lines 1))
             (last lines)
             (list))]
 
-    [(list (focus _ _ _) lines)
-     (focus-append-below log lines)]))
+    [(list (focus a c b) lines)
+     (let ([all-lines (append (reverse a) (list c) b lines)])
+       (focus (reverse (drop-right all-lines 1))
+              (last lines)
+              (list)))]))
 
 
 #;(-> Choice #:first-entry? Boolean (List String))
@@ -320,27 +316,3 @@
     [(focus _ _ (list)) foc]
     [(focus a m (list h t ...))
      (focus (cons m a) h t)]))
-
-
-#;(-> (Focus x) (Focus x))
-(define (focus-scroll-down foc)
-  (match foc
-    [(focus _ _ (list)) foc]
-    [(focus a c b)
-     (focus (append (drop-right b 1) (cons c a))
-            (last b)
-            (list))]))
-
-
-#;(-> (Focus x) (Focus x))
-#;(define (focus-append-above foc aboves)
-  (match foc
-    [(focus a c b)
-     (focus (append (reverse aboves) a) c b)]))
-
-
-#;(-> (Focus x) (Focus x))
-(define (focus-append-below foc belows)
-  (match foc
-    [(focus a c b)
-     (focus a c (append b belows))]))
